@@ -33,23 +33,6 @@
 
 bool GCodeParser::volumetric_enabled;
 
-#if ENABLED(PHOTO_Z_LAYER)
-  //begin add by jason.wu for detect layer change to notify remote controller capture
-  uint8_t GCodeParser::layer_change_flag = 0;
-  
-  float GCodeParser::layer_num = 0;
-  //end add by jason.wu for detect layer change to notify remote controller capture
-
-  /******************************************************************/
-    bool       GCodeParser::report_layer;
-    float     GCodeParser::report_layer_num;
-    xyze_pos_t GCodeParser::report_pos;  
-#endif
-
-#if ENABLED(ANKER_M_CMDBUF)
-  uint8_t GCodeParser::anker_m_cmdbuf_large_queue_flag = 0;
-#endif
-
 #if ENABLED(INCH_MODE_SUPPORT)
   float GCodeParser::linear_unit_factor, GCodeParser::volumetric_unit_factor;
 #endif
@@ -150,8 +133,6 @@ void GCodeParser::parse(char *p) {
 
   // *p now points to the current command, which should be G, M, or T
   command_ptr = p;
-
-  // SERIAL_ECHOLNPAIR("<==>",command_ptr);
 
   // Get the command letter, which must be G, M, or T
   const char letter = uppercase(*p++);
@@ -267,7 +248,7 @@ void GCodeParser::parse(char *p) {
         case 'R': if (!WITHIN(motion_mode_codenum, 2, 3)) return;
       #endif
 
-      LOGICAL_AXIS_GANG(case 'E':, case 'X':, case 'Y':, case 'Z':, case AXIS4_NAME:, case AXIS5_NAME:, case AXIS6_NAME:)
+      LOGICAL_AXIS_GANG(case 'E':, case 'X':, case 'Y':, case 'Z':, case AXIS4_NAME:, case AXIS5_NAME:, case AXIS6_NAME:, case AXIS7_NAME:, case AXIS8_NAME:, case AXIS9_NAME:)
       case 'F':
         if (motion_mode_codenum < 0) return;
         command_letter = 'G';
@@ -352,7 +333,7 @@ void GCodeParser::parse(char *p) {
 
       #if ENABLED(DEBUG_GCODE_PARSER)
         if (debug) {
-          SERIAL_ECHOPAIR("Got param ", AS_CHAR(param), " at index ", p - command_ptr - 1);
+          SERIAL_ECHOPGM("Got param ", AS_CHAR(param), " at index ", p - command_ptr - 1);
           if (has_val) SERIAL_ECHOPGM(" (has_val)");
         }
       #endif
@@ -360,7 +341,7 @@ void GCodeParser::parse(char *p) {
       if (!has_val && !string_arg) {            // No value? First time, keep as string_arg
         string_arg = p - 1;
         #if ENABLED(DEBUG_GCODE_PARSER)
-          if (debug) SERIAL_ECHOPAIR(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
+          if (debug) SERIAL_ECHOPGM(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
         #endif
       }
 
@@ -371,7 +352,7 @@ void GCodeParser::parse(char *p) {
     else if (!string_arg) {                     // Not A-Z? First time, keep as the string_arg
       string_arg = p - 1;
       #if ENABLED(DEBUG_GCODE_PARSER)
-        if (debug) SERIAL_ECHOPAIR(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
+        if (debug) SERIAL_ECHOPGM(" string_arg: ", hex_address((void*)string_arg)); // DEBUG
       #endif
     }
 
@@ -409,7 +390,7 @@ void GCodeParser::unknown_command_warning() {
 #if ENABLED(DEBUG_GCODE_PARSER)
 
   void GCodeParser::debug() {
-    SERIAL_ECHOPAIR("Command: ", command_ptr, " (", command_letter);
+    SERIAL_ECHOPGM("Command: ", command_ptr, " (", command_letter);
     SERIAL_ECHO(codenum);
     SERIAL_ECHOLNPGM(")");
     #if ENABLED(FASTER_GCODE_PARSER)
@@ -417,18 +398,18 @@ void GCodeParser::unknown_command_warning() {
       for (char c = 'A'; c <= 'Z'; ++c) if (seen(c)) SERIAL_CHAR(c, ' ');
       SERIAL_CHAR('}');
     #else
-      SERIAL_ECHOPAIR(" args: { ", command_args, " }");
+      SERIAL_ECHOPGM(" args: { ", command_args, " }");
     #endif
     if (string_arg) {
-      SERIAL_ECHOPAIR(" string: \"", string_arg);
+      SERIAL_ECHOPGM(" string: \"", string_arg);
       SERIAL_CHAR('"');
     }
     SERIAL_ECHOLNPGM("\n");
     for (char c = 'A'; c <= 'Z'; ++c) {
       if (seen(c)) {
-        SERIAL_ECHOPAIR("Code '", c); SERIAL_ECHOPGM("':");
+        SERIAL_ECHOPGM("Code '", c); SERIAL_ECHOPGM("':");
         if (has_value()) {
-          SERIAL_ECHOLNPAIR(
+          SERIAL_ECHOLNPGM(
             "\n    float: ", value_float(),
             "\n     long: ", value_long(),
             "\n    ulong: ", value_ulong(),

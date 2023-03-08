@@ -77,13 +77,6 @@ void GcodeSuite::M104_M109(const bool isM109) {
 
   if (DEBUGGING(DRYRUN)) return;
 
-  #if ENABLED(ANKER_TEMP_WATCH)
-    if(thermalManager.temp_watch_is_error())
-    {
-      return;
-    }
-  #endif
-
   #if ENABLED(MIXING_EXTRUDER) && MIXING_VIRTUAL_TOOLS > 1
     constexpr int8_t target_extruder = 0;
   #else
@@ -93,12 +86,9 @@ void GcodeSuite::M104_M109(const bool isM109) {
 
   bool got_temp = false;
   celsius_t temp = 0;
-  if(isM109)
-    SERIAL_ECHO("Deal M109\r\n");
-  else
-    SERIAL_ECHO("Deal M104\r\n");
+
   // Accept 'I' if temperature presets are defined
-  #if PREHEAT_COUNT
+  #if HAS_PREHEAT
     got_temp = parser.seenval('I');
     if (got_temp) {
       const uint8_t index = parser.value_byte();
@@ -136,7 +126,7 @@ void GcodeSuite::M104_M109(const bool isM109) {
     #endif
 
     if (thermalManager.isHeatingHotend(target_extruder) || !no_wait_for_cooling)
-      thermalManager.set_heating_message(target_extruder);
+      thermalManager.set_heating_message(target_extruder, !isM109 && got_temp);
   }
 
   TERN_(AUTOTEMP, planner.autotemp_M104_M109());

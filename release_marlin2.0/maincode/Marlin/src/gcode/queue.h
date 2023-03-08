@@ -68,7 +68,7 @@ public:
    * A handy ring buffer type
    */
   struct RingBuffer {
-    uint16_t length,                 //!< Number of commands in the queue
+    uint8_t length,                 //!< Number of commands in the queue
             index_r,                //!< Ring buffer's read position
             index_w;                //!< Ring buffer's write position
     CommandLine commands[BUFSIZE];  //!< The ring buffer of commands
@@ -77,7 +77,7 @@ public:
 
     inline void clear() { length = index_r = index_w = 0; }
 
-    void advance_pos(uint16_t &p, const int inc) { if (++p >= BUFSIZE) p = 0; length += inc; }
+    void advance_pos(uint8_t &p, const int inc) { if (++p >= BUFSIZE) p = 0; length += inc; }
 
     void commit_command(bool skip_ok
       OPTARG(HAS_MULTI_SERIAL, serial_index_t serial_ind = serial_index_t())
@@ -88,11 +88,7 @@ public:
     );
 
     void ok_to_send();
-    #if ENABLED(ANKER_MULTIORDER_PACK)
-      inline unsigned int buf_free_size(){return BUFSIZE - ring_buffer.length;}
-      //Each command will return the remaining buffer space
-      void report_buf_free_size(); //{int left = BUFSIZE - ring_buffer.length;SERIAL_ECHOLNPAIR("+RINGBUF-RES:", left);}
-    #endif
+
     inline bool full(uint8_t cmdCount=1) const { return length > (BUFSIZE - cmdCount); }
 
     inline bool occupied() const { return length != 0; }
@@ -130,31 +126,40 @@ public:
    * Don't inject comments or use leading spaces!
    * Aborts the current PROGMEM queue so only use for one or two commands.
    */
-  static inline void inject_P(PGM_P const pgcode) { injected_commands_P = pgcode; }
+  static void inject_P(PGM_P const pgcode) { injected_commands_P = pgcode; }
+  static void inject(FSTR_P const fgcode) { inject_P(FTOP(fgcode)); }
 
   /**
    * Enqueue command(s) to run from SRAM. Drained by process_injected_command().
    * Aborts the current SRAM queue so only use for one or two commands.
    */
-  static inline void inject(char * const gcode) {
+  static void inject(const char * const gcode) {
     strncpy(injected_commands, gcode, sizeof(injected_commands) - 1);
   }
 
   /**
    * Enqueue and return only when commands are actually enqueued
    */
-  static void enqueue_one_now(const char *cmd);
+  static void enqueue_one_now(const char * const cmd);
+  static void enqueue_one_now(FSTR_P const fcmd);
 
   /**
    * Attempt to enqueue a single G-code command
    * and return 'true' if successful.
    */
-  static bool enqueue_one_P(PGM_P const pgcode);
+  static bool enqueue_one(FSTR_P const fcmd);
+
+  /**
+   * Enqueue with Serial Echo
+   * Return true on success
+   */
+  static bool enqueue_one(const char *cmd);
 
   /**
    * Enqueue from program memory and return only when commands are actually enqueued
    */
-  static void enqueue_now_P(PGM_P const cmd);
+  static void enqueue_now_P(PGM_P const pcmd);
+  static void enqueue_now(FSTR_P const fcmd) { enqueue_now_P(FTOP(fcmd)); }
 
   /**
    * Check whether there are any commands yet to be executed
@@ -188,7 +193,7 @@ public:
    *   P<int>  Planner space remaining
    *   B<int>  Block queue space remaining
    */
-  static inline void ok_to_send() { ring_buffer.ok_to_send(); }
+  static void ok_to_send() { ring_buffer.ok_to_send(); }
 
   /**
    * Clear the serial line and request a resend of
@@ -199,7 +204,7 @@ public:
   /**
    * (Re)Set the current line number for the last received command
    */
-  static inline void set_current_line_number(long n) { serial_state[ring_buffer.command_port().index].last_N = n; }
+  static void set_current_line_number(long n) { serial_state[ring_buffer.command_port().index].last_N = n; }
 
   #if ENABLED(BUFFER_MONITORING)
 
@@ -233,7 +238,7 @@ public:
 
     static void auto_report_buffer_statistics();
 
-    static inline void set_auto_report_interval(uint8_t v) {
+    static void set_auto_report_interval(uint8_t v) {
       NOMORE(v, 60);
       auto_buffer_report_interval = v;
       next_buffer_report_ms = millis() + 1000UL * v;
@@ -242,10 +247,7 @@ public:
   #endif // BUFFER_MONITORING
 
 private:
-#ifdef ANKER_MULTIORDER_PACK
-  static void multi_pack_process(char *buf, unsigned int chkpos, int p);
-  static bool multi_pack_recv(int c, int p);
-#endif
+
   static void get_serial_commands();
 
   #if ENABLED(SDSUPPORT)
@@ -258,13 +260,7 @@ private:
   // Process the next "immediate" command (SRAM)
   static bool process_injected_command();
 
-  /**
-   * Enqueue with Serial Echo
-   * Return true on success
-   */
-  static bool enqueue_one(const char *cmd);
-
-  static void gcode_line_error(PGM_P const err, const serial_index_t serial_ind);
+  static void gcode_line_error(FSTR_P const ferr, const serial_index_t serial_ind);
 
   friend class GcodeSuite;
 };
