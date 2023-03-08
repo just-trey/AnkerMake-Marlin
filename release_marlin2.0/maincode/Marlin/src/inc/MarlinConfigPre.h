@@ -34,15 +34,9 @@
   #include "../HAL/platforms.h"
 #endif
 
-#include "ANKER_Config.h"
-
 #include "../core/macros.h"
 #include "../core/boards.h"
-
-#if MACCHINE == MOTOR_5X_DVT
-  #include "../../Configuration/V8111-5X/ANKER/DVT/Configuration.h"
-#endif
-
+#include "../../Configuration.h"
 
 #ifdef CUSTOM_VERSION_FILE
   #if __has_include(STRINGIFY(../../CUSTOM_VERSION_FILE))
@@ -59,10 +53,7 @@
 #endif
 
 #include "../core/drivers.h"
-
-#if MACCHINE == MOTOR_5X_DVT
-  #include "../../Configuration/V8111-5X/ANKER/DVT/Configuration_adv.h"
-#endif
+#include "../../Configuration_adv.h"
 
 #include "Conditionals_adv.h"
 

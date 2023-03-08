@@ -24,9 +24,9 @@
 /**
  * Release version. Leave the Marlin version or apply a custom scheme.
  */
-// #ifndef SHORT_BUILD_VERSION
-//   #define SHORT_BUILD_VERSION "bugfix-2.0.x"
-// #endif
+#ifndef SHORT_BUILD_VERSION
+  #define SHORT_BUILD_VERSION "2.1.2"
+#endif
 
 /**
  * Verbose version identifier containing a unique identifier, such as the
@@ -42,7 +42,7 @@
  * version was tagged.
  */
 #ifndef STRING_DISTRIBUTION_DATE
-  #define STRING_DISTRIBUTION_DATE "2021-09-03"
+  #define STRING_DISTRIBUTION_DATE "2022-12-17"
 #endif
 
 /**
@@ -52,7 +52,7 @@
  * to alert users to major changes.
  */
 
-#define MARLIN_HEX_VERSION 02000901
+#define MARLIN_HEX_VERSION 02010200
 #ifndef REQUIRED_CONFIGURATION_H_VERSION
   #define REQUIRED_CONFIGURATION_H_VERSION MARLIN_HEX_VERSION
 #endif

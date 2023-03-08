@@ -45,7 +45,14 @@
 //
 // Steppers
 //
+#define E0_STEP_PIN                           36
+#define E0_DIR_PIN                            34
+#define E0_ENABLE_PIN                         30
 #define E0_CS_PIN                             44
+
+#define E1_STEP_PIN                           26
+#define E1_DIR_PIN                            28
+#define E1_ENABLE_PIN                         24
 #define E1_CS_PIN                             42
 
 //
@@ -68,48 +75,25 @@
   #define E0_SERIAL_RX_PIN                    65
 #endif
 
-#include "pins_RAMPS.h"
-
-//
-// Steppers
-//
-#undef E0_STEP_PIN
-#undef E0_DIR_PIN
-#undef E0_ENABLE_PIN
-#define E0_STEP_PIN                           36
-#define E0_DIR_PIN                            34
-#define E0_ENABLE_PIN                         30
-
-#undef E1_STEP_PIN
-#undef E1_DIR_PIN
-#undef E1_ENABLE_PIN
-#define E1_STEP_PIN                           26
-#define E1_DIR_PIN                            28
-#define E1_ENABLE_PIN                         24
-
 //
 // LCD / Controller
 //
 #if IS_RRD_FG_SC
-  #undef BEEPER_PIN
   #define BEEPER_PIN                          35
 
-  #undef LCD_PINS_RS
-  #undef LCD_PINS_ENABLE
-  #undef LCD_PINS_D4
   #define LCD_PINS_RS                         27
   #define LCD_PINS_ENABLE                     23
   #define LCD_PINS_D4                         37
 
-  #undef LCD_SDSS
-  #undef SD_DETECT_PIN
   #define LCD_SDSS                            53
   #define SD_DETECT_PIN                       49
 
-  #undef BTN_EN1
-  #undef BTN_EN2
-  #undef BTN_ENC
   #define BTN_EN1                             29
   #define BTN_EN2                             25
   #define BTN_ENC                             16
+
+  #define LCD_PINS_DEFINED
+
 #endif
+
+#include "pins_RAMPS.h"

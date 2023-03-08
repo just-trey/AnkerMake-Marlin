@@ -22,7 +22,7 @@
 #pragma once
 
 #if HOTENDS > 2 || E_STEPPERS > 2
-  #error "Dagoma3D F5 supports only 2 hotends / E-steppers. Comment out this line to continue."
+  #error "Dagoma3D F5 supports up to 2 hotends / E steppers."
 #endif
 
 #define BOARD_INFO_NAME "Dagoma3D F5"
@@ -40,10 +40,10 @@
 #endif
 
 // Alter timing for graphical display
-#if ENABLED(U8GLIB_ST7920)
-  #define BOARD_ST7920_DELAY_1 DELAY_NS(0)
-  #define BOARD_ST7920_DELAY_2 DELAY_NS(250)
-  #define BOARD_ST7920_DELAY_3 DELAY_NS(250)
+#if IS_U8GLIB_ST7920
+  #define BOARD_ST7920_DELAY_1                 0
+  #define BOARD_ST7920_DELAY_2               250
+  #define BOARD_ST7920_DELAY_3               250
 #endif
 
 //

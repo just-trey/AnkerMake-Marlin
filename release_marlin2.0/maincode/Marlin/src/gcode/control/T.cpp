@@ -49,7 +49,7 @@
 void GcodeSuite::T(const int8_t tool_index) {
 
   DEBUG_SECTION(log_T, "T", DEBUGGING(LEVELING));
-  if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR("...(", tool_index, ")");
+  if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("...(", tool_index, ")");
 
   // Count this command as movement / activity
   reset_stepper_timeout();
@@ -59,11 +59,6 @@ void GcodeSuite::T(const int8_t tool_index) {
       mmu2.tool_change(parser.string_arg);   // Special commands T?/Tx/Tc
       return;
     }
-  #endif
-  
-  #if ENABLED(ANKER_EXTRUDERS)
-     MYSERIAL1.printf("M2008 S%d\n",tool_index);
-     MYSERIAL3.printf("M2008 S%d\n",tool_index);
   #endif
 
   tool_change(tool_index
